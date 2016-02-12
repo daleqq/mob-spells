@@ -1048,7 +1048,7 @@ function MobSpells:Filter(text)
         local v = t[i-zOffset]
         local offset = 0
         if self.searchIndex == "ZONE" then
-            if #v.children == 0 then
+            if v and #v.children == 0 then
                 tremove(t, i - zOffset)
                 zOffset = zOffset + 1
             end
