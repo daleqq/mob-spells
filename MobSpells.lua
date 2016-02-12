@@ -33,6 +33,7 @@ local defaults = {
 		recordWhenRaid = true,
 		fiveman = true,
 		fivemanHeroic = true,
+        fivemanMythic = true,
 		challengemode = true,
 		scenario = true,
 		heroicscenario = true,
@@ -46,9 +47,42 @@ local defaults = {
 		flexibleHeroic = true,
 		mythic = true,
 		flexibleLFR = true,
+        event1 = nil,
+        event2 = nil,
+        eventScenario = nil,
+        fivemanMythic = true,
+        fivemanTimewalker = true
 	},
 }
+--[[
+  The difficulty IDs
+  1  : "Normal" (Dungeons)
+  2  : "Heroic" (Dungeons)
+  3  : "10 Player"
+  4  : "25 Player"
+  5  : "10 Player (Heroic)"
+  6  : "25 Player (Heroic)"
+  7  : "Looking For Raid" (Legacy; everything prior to Siege of Orgrimmar)
+  8  : "Challenge Mode"
+  9  : "40 Player"
+  10 : nil
+  11 : "Heroic Scenario"
+  12 : "Normal Scenario"
+  13 : nil
+  14 : "Normal" (Raids)
+  15 : "Herioc" (Raids)
+  16 : "Mythic" (Raids)
+  17 : "Looking For Raid"
+  18 : "Event"
+  19 : "Event"
+  20 : "Event Scenario"
+  21 : nil
+  22 : nil
+  23 : "Mythic" (Dungeons)
+  24 : Timewalker
+]]--
 local DIFFICULTY_NONE, DIFFICULTY_HEROIC_SCENARIO, DIFFICULTY_SCENARIO = 0,11,12
+local EVENT1, EVENT2, EVENT_SCENARIO, DIFFICULTY_DUNGEON_MYTHIC, DIFFICULTY_DUNGEON_TIMEWALER = 18, 19, 20, 23, 24
 
 local diffIDtoName = { -- as returned by local name, type, diffID = GetInstanceInfo(); 
 	[DIFFICULTY_NONE] 					= _G.NONE, -- 0
@@ -69,6 +103,11 @@ local diffIDtoName = { -- as returned by local name, type, diffID = GetInstanceI
 	[_G.DIFFICULTY_PRIMARYRAID_HEROIC]	= _G.PLAYER_DIFFICULTY4, -- 15
 	[_G.DIFFICULTY_PRIMARYRAID_MYTHIC]	= _G.PLAYER_DIFFICULTY6, -- 16
 	[_G.DIFFICULTY_PRIMARYRAID_LFR]		= _G.RAID_FINDER, -- 17
+    [EVENT1]                            = "", -- 18  -- TODO: Change to right description
+    [EVENT2]                            = "", -- 19  -- TODO: Change to right description
+    [EVENT_SCENARIO]                    = "", -- 20  -- TODO: Change to right description
+    [DIFFICULTY_DUNGEON_MYTHIC]         = "", -- 23  -- TODO: Change to right description
+    [DIFFICULTY_DUNGEON_TIMEWALER]      = "", -- 24  -- TODO: Change to right description
 }
 local diffIDtoOption = {
 	[_G.DIFFICULTY_DUNGEON_NORMAL] 		= "fiveman", -- 1
@@ -88,6 +127,12 @@ local diffIDtoOption = {
 	[_G.DIFFICULTY_PRIMARYRAID_HEROIC]	= "flexibleHeroic", -- 15
 	[_G.DIFFICULTY_PRIMARYRAID_MYTHIC]	= "mythic", -- 16
 	[_G.DIFFICULTY_PRIMARYRAID_LFR]		= "flexibleLFR", -- 17
+
+    [EVENT1]                            = "event1", -- 18
+    [EVENT2]                            = "event2", -- 19
+    [EVENT_SCENARIO]                    = "eventScenario", -- 20
+    [DIFFICULTY_DUNGEON_MYTHIC]         = "fivemanMythic", -- 23
+    [DIFFICULTY_DUNGEON_TIMEWALER]      = "fivemanTimewalker", -- 24
 }
 
 local mobs
@@ -388,6 +433,36 @@ local options = {
 					desc = L["Record in %s."]:format(_G["PLAYER_DIFFICULTY6"]),
 					order = 15,
 				},
+                event1 = {
+                    type = "toggle",
+                    name = "", -- TODO: Change to right description
+                    desc = L["Record in %s."]:format(""), -- TODO: Change to right description
+                    order = 16,
+                },
+                event2 = {
+                    type = "toggle",
+                    name = "", -- TODO: Change to right description
+                    desc = L["Record in %s."]:format(""), -- TODO: Change to right description
+                    order = 17,
+                },
+                eventScenario = {
+                    type = "toggle",
+                    name = "", -- TODO: Change to right description
+                    desc = L["Record in %s."]:format(""), -- TODO: Change to right description
+                    order = 18,
+                },
+                fivemanMythic = {
+                    type = "toggle",
+                    name = "", -- TODO: Change to right description
+                    desc = L["Record in %s."]:format(""), -- TODO: Change to right description
+                    order = 19,
+                },
+                fivemanTimewalker = {
+                    type = "toggle",
+                    name = "", -- TODO: Change to right description
+                    desc = L["Record in %s."]:format(""), -- TODO: Change to right description
+                    order = 20,
+                },
 			},
 		},
 	},
@@ -592,7 +667,8 @@ do
 		if not mobs[zone] then return end
 		local guid = UnitGUID("mouseover")
 		if not guid then return end
-		local NPCID = tonumber(guid:sub(-16, -12), 16)
+        local type, zero, server_id, instance_id, zone_uid, npc_id, spawn_uid = strsplit("-", guid);
+		local NPCID = tonumber(npc_id, 16)
 		if NPCID == 0 then return end
 
 		if mobs[zone][NPCID] and mobs[zone][NPCID].spells and not MOB_BLACKLIST[NPCID] then
@@ -650,7 +726,8 @@ function MobSpells:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 		bit_band(srcFlags, COMBATLOG_OBJECT_TYPE_NPC) ~= COMBATLOG_OBJECT_TYPE_NPC then return end
 
 	-- Get the real NPC ID, and bail out early if it's blacklisted or invalid.
-	local NPCID = tonumber(srcGUID:sub(-16, -12), 16) -- http://wow.gamepedia.com/GUID
+    local type, zero, server_id, instance_id, zone_uid, npc_id, spawn_uid = strsplit("-", srcGUID);
+	local NPCID = tonumber(npc_id, 16) -- http://wow.gamepedia.com/GUID
 	if not NPCID or MOB_BLACKLIST[NPCID] then return end
 
 	-- If we can't determine the name properly, mark it as UNKNOWN
@@ -721,6 +798,11 @@ local function SelectSpell(widget, event, value)
 		[_G.DIFFICULTY_PRIMARYRAID_HEROIC]={}, -- 15
 		[_G.DIFFICULTY_PRIMARYRAID_MYTHIC]={}, -- 16
 		[_G.DIFFICULTY_PRIMARYRAID_LFR]={}, -- 17
+        [EVENT1] = {}, -- 18
+        [EVENT2] = {}, -- 19
+        [EVENT_SCENARIO] = {}, -- 20
+        [DIFFICULTY_DUNGEON_MYTHIC]  = {}, -- 23
+        [DIFFICULTY_DUNGEON_TIMEWALER] = {}, -- 24
 	}
 	for spellId, data in pairs(data.spells) do
 		if not SPELL_BLACKLIST[spellId] then
@@ -792,7 +874,7 @@ function MobSpells:CreateFrame()
 	local dropdown = AceGUI:Create("Dropdown")
 	dropdown:SetText(L["NPCs"])
 	dropdown:SetLabel(L["Search"])
-	dropdown:SetList({NPC = L["NPCs"], SPELL = L["Spells"]})
+	dropdown:SetList({NPC = L["NPCs"], SPELL = L["Spells"], ZONE = L["Zones"]})
 	dropdown:SetWidth(100)
 	dropdown:SetCallback("OnValueChanged",function(widget,event,value) MobSpells.searchIndex = value end )
 
@@ -965,35 +1047,45 @@ function MobSpells:Filter(text)
 	for i = 1, #t do
 		local v = t[i-zOffset]
 		local offset = 0
-		for j = 1, #v.children do
-			local child = v.children[j-offset]
-			local useMob = false
-			if #text == 0 then
-				useMob = true
-			end
-			if self.searchIndex == "NPC" then
-				-- escape magic chars so we can search for eg. 'Shado-Pan' without tripping over '-'
-				if child.text:lower():match((text:gsub("[%(%)%.%%%+%-%*%?%[%]%^%$]", "%%%0")):lower()) then
-					useMob = true
-				end
-			elseif self.searchIndex == "SPELL" then
-				for k, v in pairs(mobs[v.value][child.value].spells) do
-					local name = GetSpellInfo(k)
-					if name and name:lower():match(text:lower()) then
-						useMob = true
-						break
-					end
-				end
-			end
-			if not useMob then
-				tremove(v.children, j - offset)
-				offset = offset + 1
-			end
-		end
-		if #v.children == 0 then
-			tremove(t, i - zOffset)
-			zOffset = zOffset + 1
-		end
+        if self.searchIndex == "ZONE" then
+            if #v.children == 0 then
+                tremove(t, i - zOffset)
+                zOffset = zOffset + 1
+            end
+            if not v.text:lower():match(text:lower()) then
+                tremove(t, i - zOffset)
+            end
+        else
+            for j = 1, #v.children do
+                local child = v.children[j-offset]
+                local useMob = false
+                if #text == 0 then
+                    useMob = true
+                end
+                if self.searchIndex == "NPC" then
+                    -- escape magic chars so we can search for eg. 'Shado-Pan' without tripping over '-'
+                    if child.text:lower():match((text:gsub("[%(%)%.%%%+%-%*%?%[%]%^%$]", "%%%0")):lower()) then
+                        useMob = true
+                    end
+                elseif self.searchIndex == "SPELL" then
+                    for k, v in pairs(mobs[v.value][child.value].spells) do
+                        local name = GetSpellInfo(k)
+                        if name and name:lower():match(text:lower()) then
+                            useMob = true
+                            break
+                        end
+                    end
+                end
+            end
+            if not useMob then
+                tremove(v.children, j - offset)
+                offset = offset + 1
+            end
+            if #v.children == 0 then
+                tremove(t, i - zOffset)
+                zOffset = zOffset + 1
+            end
+        end
 	end
 	frame.tree:SetTree(t)
 end
@@ -1009,7 +1101,8 @@ function MobSpells:GetSpells(unit)
 	frame.editBox:SetText(name)
 	self:Filter(name)
 	local guid = UnitGUID(unit)
-	local NPCID = tonumber(guid:sub(-16, -12), 16)
+    local _, _, _, _, _, npc_id = strsplit("-", guid);
+	local NPCID = tonumber(npc_id, 16)
 	frame.tree:SelectByValue(GetRealZoneText() .. "\001" .. NPCID)
 end
 
@@ -1024,7 +1117,8 @@ function MobSpells:ReportTargetSpells()
 		return
 	end
 	local guid = UnitGUID(unit)
-	local NPCID = tonumber(guid:sub(-16, -12), 16)
+    local _, _, _, _, _, npc_id = strsplit("-", guid);
+	local NPCID = tonumber(npc_id, 16)
 	local name = UnitName(unit)
 
 	self:ReportMobSpells(GetRealZoneText(), NPCID, name)
