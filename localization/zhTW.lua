@@ -70,3 +70,4 @@ L["Record in %s."] = "記錄在%s。"
 L["Find Target"] = "發現目標"
 L["Report this mob"] = "發布此怪物"
 L["Unnamed Mob found adding it as 'Unknown'"] = "未命名怪物以'Unknown'新增"
+L["Zones"] = true

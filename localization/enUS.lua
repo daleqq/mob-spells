@@ -71,3 +71,4 @@ L["Record in %s (%s)."] = true
 L["Find Target"] = true
 L["Report this mob"] = true
 L["Unnamed Mob found adding it as 'Unknown'"] = true
+L["Zones"] = true

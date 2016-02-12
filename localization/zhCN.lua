@@ -32,3 +32,4 @@ L["No target selected"] = "未选择目标"
 L["Heroic"] = "英雄难度"
 L["Config"] = "设置"
 L["Configure MobSpells"] = "设定MobSpells"
+L["Zones"] = true

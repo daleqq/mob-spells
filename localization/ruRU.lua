@@ -67,3 +67,4 @@ L["No recorded spells for "] = "Нет записанных способност
 L["Keywords"] = "Ключевое слово"
 L["Difficulty ..."] = "Cложность ..."
 L["Record in %s."] = "Записывать в %s."
+L["Zones"] = true

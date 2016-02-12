@@ -32,3 +32,4 @@ L["No target selected"] = "Kein Ziel ausgewählt"
 L["Heroic"] = "Heroisch"
 L["Config"] = "Konfiguration"
 L["Configure MobSpells"] = "Konfiguriere MobSpells"
+L["Zones"] = true
