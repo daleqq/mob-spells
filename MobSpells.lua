@@ -208,13 +208,13 @@ local function shouldLog()
     if should then
         MobSpells:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
         if not MobSpells.recording then
-          MobSpells:Print("Recording started ("..(i or "nil").." "..t.." "..d..")")
+          MobSpells:Print("Recording started ("..(i and tostring(i) or "nil").." "..t.." "..d..")")
         end
         MobSpells.recording = true
     else
         MobSpells:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
         if MobSpells.recording then
-          MobSpells:Print("Recording paused ("..(i or "nil").." "..t.." "..d..")")
+          MobSpells:Print("Recording paused ("..(i and tostring(i) or "nil").." "..t.." "..d..")")
         end
         MobSpells.recording = false
     end
