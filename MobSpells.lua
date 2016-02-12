@@ -103,11 +103,11 @@ local diffIDtoName = { -- as returned by local name, type, diffID = GetInstanceI
     [_G.DIFFICULTY_PRIMARYRAID_HEROIC]	= _G.PLAYER_DIFFICULTY4, -- 15
     [_G.DIFFICULTY_PRIMARYRAID_MYTHIC]	= _G.PLAYER_DIFFICULTY6, -- 16
     [_G.DIFFICULTY_PRIMARYRAID_LFR]		= _G.RAID_FINDER, -- 17
-    [EVENT1]                            = "", -- 18  -- TODO: Change to right description
-    [EVENT2]                            = "", -- 19  -- TODO: Change to right description
-    [EVENT_SCENARIO]                    = "", -- 20  -- TODO: Change to right description
-    [DIFFICULTY_DUNGEON_MYTHIC]         = "", -- 23  -- TODO: Change to right description
-    [DIFFICULTY_DUNGEON_TIMEWALER]      = "", -- 24  -- TODO: Change to right description
+    [EVENT1]                            = L["Event"], -- 18
+    [EVENT2]                            = L["Event"], -- 19
+    [EVENT_SCENARIO]                    = L["Event Scenario"], -- 20
+    [DIFFICULTY_DUNGEON_MYTHIC]         = L["5 man (Mythic)"], -- 23
+    [DIFFICULTY_DUNGEON_TIMEWALER]      = L["Timewalker"], -- 24
 }
 local diffIDtoOption = {
     [_G.DIFFICULTY_DUNGEON_NORMAL] 		= "fiveman", -- 1
@@ -166,7 +166,7 @@ local function shouldLog()
     local should = nil
     local i, t = IsInInstance()
     if i and not t and IsInScenarioGroup() then t = "scenario" end
-    local n, _, d = GetInstanceInfo()
+    local n, _, d, difficultyName = GetInstanceInfo()
     if t == "none" then
         should = db.recordNone
     elseif t == "pvp" then
@@ -208,13 +208,13 @@ local function shouldLog()
     if should then
         MobSpells:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
         if not MobSpells.recording then
-          MobSpells:Print("Recording started ("..(i and tostring(i) or "nil").." "..t.." "..d..")")
+          MobSpells:Print("Recording started ("..(i and tostring(i) or "nil").." "..t.." "..difficultyName..")")
         end
         MobSpells.recording = true
     else
         MobSpells:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
         if MobSpells.recording then
-          MobSpells:Print("Recording paused ("..(i and tostring(i) or "nil").." "..t.." "..d..")")
+          MobSpells:Print("Recording paused ("..(i and tostring(i) or "nil").." "..t.." "..difficultyName..")")
         end
         MobSpells.recording = false
     end
@@ -435,32 +435,32 @@ local options = {
                 },
                 event1 = {
                     type = "toggle",
-                    name = "", -- TODO: Change to right description
-                    desc = L["Record in %s."]:format(""), -- TODO: Change to right description
+                    name = L["Event"],
+                    desc = L["Record in %s."]:format(L["Event"]),
                     order = 16,
                 },
                 event2 = {
                     type = "toggle",
-                    name = "", -- TODO: Change to right description
-                    desc = L["Record in %s."]:format(""), -- TODO: Change to right description
+                    name = L["Event"],
+                    desc = L["Record in %s."]:format(L["Event"]),
                     order = 17,
                 },
                 eventScenario = {
                     type = "toggle",
-                    name = "", -- TODO: Change to right description
-                    desc = L["Record in %s."]:format(""), -- TODO: Change to right description
+                    name = L["Event Scenario"],
+                    desc = L["Record in %s."]:format(L["Event Scenario"]),
                     order = 18,
                 },
                 fivemanMythic = {
                     type = "toggle",
-                    name = "", -- TODO: Change to right description
-                    desc = L["Record in %s."]:format(""), -- TODO: Change to right description
+                    name = L["5 man (Mythic)"],
+                    desc = L["Record in %s."]:format(L["5 man (Mythic)"]),
                     order = 19,
                 },
                 fivemanTimewalker = {
                     type = "toggle",
-                    name = "", -- TODO: Change to right description
-                    desc = L["Record in %s."]:format(""), -- TODO: Change to right description
+                    name = L["Timewalker"],
+                    desc = L["Record in %s."]:format(L["Timewalker"]),
                     order = 20,
                 },
             },
@@ -1052,8 +1052,9 @@ function MobSpells:Filter(text)
                 tremove(t, i - zOffset)
                 zOffset = zOffset + 1
             end
-            if not v.text:lower():match(text:lower()) then
+            if v and not v.text:lower():match(text:lower()) then
                 tremove(t, i - zOffset)
+                zOffset = zOffset + 1
             end
         else
             for j = 1, #v.children do
@@ -1076,10 +1077,10 @@ function MobSpells:Filter(text)
                         end
                     end
                 end
-            end
-            if not useMob then
-                tremove(v.children, j - offset)
-                offset = offset + 1
+                if not useMob then
+                    tremove(v.children, j - offset)
+                    offset = offset + 1
+                end
             end
             if #v.children == 0 then
                 tremove(t, i - zOffset)
