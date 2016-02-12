@@ -1,0 +1,23 @@
+## Interface: 60000
+## Title: MobSpells
+## Author: Antiarc, Rabbit
+## Notes: Stores a browsable database of spells that mobs cast
+## Notes-ruRU: Сохраняет доступную для просмотра базу данных, по применяемым способностям существ
+## Notes-zhCN: 储存一个可浏览的怪物法术资料库
+## Notes-zhTW: 儲存一個可瀏覽的怪物法術資料庫
+## SavedVariables: MobSpellsDB
+## X-Embeds: Ace3
+## OptionalDeps: Ace3
+## Version: @project-version@
+## LoadManagers: AddonLoader
+## X-LoadOn-Always: delayed
+## X-LoadOn-Slash: /mobspells, /ms, /spells
+
+embeds.xml
+localization\enUS.lua
+localization\ruRU.lua
+localization\deDE.lua
+localization\zhTW.lua
+localization\zhCN.lua
+MobSpells.lua
+
