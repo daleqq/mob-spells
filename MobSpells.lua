@@ -668,7 +668,7 @@ do
         local guid = UnitGUID("mouseover")
         if not guid then return end
         local type, zero, server_id, instance_id, zone_uid, npc_id, spawn_uid = strsplit("-", guid);
-        local NPCID = tonumber(npc_id, 16)
+        local NPCID = tonumber(npc_id or 0, 16)
         if NPCID == 0 then return end
 
         if mobs[zone][NPCID] and mobs[zone][NPCID].spells and not MOB_BLACKLIST[NPCID] then
@@ -727,7 +727,7 @@ function MobSpells:COMBAT_LOG_EVENT_UNFILTERED(event, ...)
 
     -- Get the real NPC ID, and bail out early if it's blacklisted or invalid.
     local type, zero, server_id, instance_id, zone_uid, npc_id, spawn_uid = strsplit("-", srcGUID);
-    local NPCID = tonumber(npc_id, 16) -- http://wow.gamepedia.com/GUID
+    local NPCID = tonumber(npc_id or 0, 16) -- http://wow.gamepedia.com/GUID
     if not NPCID or MOB_BLACKLIST[NPCID] then return end
 
     -- If we can't determine the name properly, mark it as UNKNOWN
@@ -1102,7 +1102,7 @@ function MobSpells:GetSpells(unit)
     self:Filter(name)
     local guid = UnitGUID(unit)
     local _, _, _, _, _, npc_id = strsplit("-", guid);
-    local NPCID = tonumber(npc_id, 16)
+    local NPCID = tonumber(npc_id or 0, 16)
     frame.tree:SelectByValue(GetRealZoneText() .. "\001" .. NPCID)
 end
 
@@ -1118,7 +1118,7 @@ function MobSpells:ReportTargetSpells()
     end
     local guid = UnitGUID(unit)
     local _, _, _, _, _, npc_id = strsplit("-", guid);
-    local NPCID = tonumber(npc_id, 16)
+    local NPCID = tonumber(npc_id or 0, 16)
     local name = UnitName(unit)
 
     self:ReportMobSpells(GetRealZoneText(), NPCID, name)
