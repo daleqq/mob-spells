@@ -68,7 +68,6 @@ L["Keywords"] = "Ключевое слово"
 L["Difficulty ..."] = "Cложность ..."
 L["Record in %s."] = "Записывать в %s."
 L["Zones"] = true
-L["Zones"] = true
 L["Event"] = true
 L["Event Scenario"] = true
 L["5 man (Mythic)"] = true

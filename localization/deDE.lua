@@ -33,7 +33,6 @@ L["Heroic"] = "Heroisch"
 L["Config"] = "Konfiguration"
 L["Configure MobSpells"] = "Konfiguriere MobSpells"
 L["Zones"] = true
-L["Zones"] = true
 L["Event"] = true
 L["Event Scenario"] = true
 L["5 man (Mythic)"] = true
